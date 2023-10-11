@@ -11,14 +11,22 @@ ctx.lineWidth = 1
 class Particle {
     constructor(effect) {
         this.effect = effect
-        this.x = Math.floor(Math.random() * this.effect.width)
-        this.y = Math.floor(Math.random() * this.effect.height)
+        
+        this.initializeCoords();
+
         this.speedX = Math.random() * 5- 2.5
         this.speedY = Math.random() * 5- 2.5
-        this.history = [{x: this.x, y: this.y}]
         this.maxLength = Math.floor(Math.random() * 100 + 10)
         this.angle = 0
     }
+
+    initializeCoords() {
+        this.x = Math.floor(Math.random() * this.effect.width)
+        this.y = Math.floor(Math.random() * this.effect.height)
+
+        this.history = [{ x: this.x, y: this.y }];
+    }
+
     draw(context) {
         context.beginPath()
         context.moveTo(this.history[0].x, this.history[0].y)
@@ -35,12 +43,19 @@ class Particle {
 
         this.speedX = Math.cos(this.angle)
         this.speedY = Math.sin(this.angle)
-        this.x += this.speedx
+        this.x += this.speedX
         this.y += this.speedY
 
         this.history.push({x: this.x, y: this.y})
         if(this.history.length > this.maxLength) {
-            this.history.shift()
+            const earliest = this.history.shift()
+
+            if (
+                earliest.x < 0 ||
+                earliest.y < 0 ||
+                this.effect.width < earliest.x ||
+                this.effect.height < earliest.y)
+                this.initializeCoords();
         }
     }
 }
